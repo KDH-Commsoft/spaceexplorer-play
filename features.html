@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SpaceExplorer — Game Overview</title>
+<style>
+  :root {
+    --bg: #0b0e16;
+    --panel: #131826;
+    --panel2: #1a2133;
+    --line: #2a3348;
+    --text: #d8dfeb;
+    --dim: #8f9aa8;
+    --green: #5ce8a8;
+    --blue: #5cb8e8;
+    --gold: #e8c95c;
+    --red: #e85c5c;
+    --purple: #b06fe8;
+    --pink: #e85ce8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background:
+      radial-gradient(1200px 600px at 80% -10%, #16203a 0%, transparent 60%),
+      radial-gradient(900px 500px at 10% 110%, #1a1430 0%, transparent 60%),
+      var(--bg);
+    color: var(--text);
+    font: 15px/1.65 "Segoe UI", system-ui, -apple-system, sans-serif;
+    padding: 40px 20px 80px;
+  }
+  main { max-width: 980px; margin: 0 auto; }
+  h1 {
+    font-size: 34px; letter-spacing: 4px; color: #fff;
+    text-align: center; margin-bottom: 4px;
+  }
+  .tagline { text-align: center; color: var(--dim); margin-bottom: 8px; }
+  .pitch {
+    max-width: 720px; margin: 18px auto 40px; text-align: center;
+    font-size: 16.5px; color: #c2cbda;
+  }
+  .pitch strong { color: var(--green); }
+  h2 {
+    font-size: 20px; margin: 52px 0 6px; color: #fff;
+    display: flex; align-items: center; gap: 10px;
+  }
+  h2 .ico { font-size: 22px; }
+  .sub { color: var(--dim); margin-bottom: 18px; }
+  section > p { max-width: 820px; }
+
+  /* Core loop */
+  .loop {
+    display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+    gap: 6px; margin: 26px 0 10px;
+  }
+  .loop .step {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 12px 16px; text-align: center; min-width: 128px;
+  }
+  .loop .step b { display: block; color: var(--green); font-size: 14px; }
+  .loop .step span { color: var(--dim); font-size: 12px; }
+  .loop .arr { color: var(--gold); font-size: 20px; padding: 0 2px; }
+  .loopnote { text-align: center; color: var(--dim); font-size: 13px; margin-bottom: 8px; }
+
+  /* Feature cards */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin-top: 18px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 18px 18px 14px; display: flex; flex-direction: column; gap: 8px;
+  }
+  .card h3 { font-size: 16px; color: #fff; display: flex; gap: 8px; align-items: center; }
+  .card p { color: #b9c2d1; font-size: 13.5px; }
+  .card ul { padding-left: 18px; color: #b9c2d1; font-size: 13.5px; }
+  .card li { margin: 3px 0; }
+  .links { margin-top: auto; padding-top: 8px; border-top: 1px dashed var(--line); font-size: 12px; }
+  .links .lbl { color: var(--dim); margin-right: 4px; }
+  .chip {
+    display: inline-block; background: var(--panel2); border: 1px solid var(--line);
+    color: var(--blue); border-radius: 20px; padding: 1px 9px; margin: 2px 2px;
+    font-size: 11.5px; white-space: nowrap;
+  }
+
+  /* Materials ladder */
+  .mats { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 4px; }
+  .mat {
+    flex: 1; min-width: 120px; border-radius: 10px; padding: 10px 12px;
+    border: 1px solid var(--line); background: var(--panel);
+  }
+  .mat b { display: block; font-size: 13.5px; }
+  .mat span { color: var(--dim); font-size: 11.5px; }
+  .swatch { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 6px; }
+
+  /* Connection map */
+  .flowbox {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+    padding: 24px; margin-top: 18px; overflow-x: auto;
+  }
+  .flow { display: flex; flex-direction: column; gap: 14px; min-width: 640px; }
+  .lane { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .lane .tag {
+    background: var(--panel2); border: 1px solid var(--line); border-radius: 8px;
+    padding: 6px 12px; font-size: 13px; white-space: nowrap;
+  }
+  .lane .verb { color: var(--gold); font-size: 12.5px; white-space: nowrap; }
+  .tag.res { color: var(--green); border-color: #2c4a3c; }
+  .tag.act { color: var(--blue); }
+  .tag.threat { color: var(--red); border-color: #4a2c2c; }
+  .tag.goal { color: var(--purple); border-color: #3d2c4a; }
+  .lanehead { color: var(--dim); font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; width: 100%; }
+
+  /* Factions */
+  .factions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .fac { flex: 1; min-width: 150px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 12.5px; }
+  .fac b { display: block; font-size: 13.5px; }
+  .fac span { color: var(--dim); }
+
+  /* Endgame timeline */
+  .timeline { display: flex; flex-wrap: wrap; gap: 6px; align-items: stretch; margin-top: 16px; }
+  .tstep {
+    flex: 1; min-width: 150px; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 10px; padding: 12px 14px; position: relative;
+  }
+  .tstep b { color: var(--purple); display: block; font-size: 13.5px; }
+  .tstep span { color: #b9c2d1; font-size: 12.5px; }
+  .tstep .n {
+    position: absolute; top: -10px; left: 12px; background: var(--purple); color: #14091f;
+    border-radius: 10px; font-size: 11px; font-weight: bold; padding: 0 8px;
+  }
+
+  table { border-collapse: collapse; width: 100%; margin-top: 14px; font-size: 13px; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); }
+  th { color: var(--dim); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+  td b { color: var(--green); }
+
+  footer { text-align: center; color: var(--dim); font-size: 12px; margin-top: 60px; }
+
+  /* Clickable cards → walkthrough modal */
+  .card[data-walk] { cursor: pointer; transition: border-color 0.15s, transform 0.15s; }
+  .card[data-walk]:hover { border-color: var(--green); transform: translateY(-2px); }
+  .card[data-walk] h3::after {
+    content: "▸ how to play"; margin-left: auto; color: var(--gold);
+    font-size: 11px; font-weight: normal; letter-spacing: 0.5px; white-space: nowrap;
+  }
+  .modal {
+    position: fixed; inset: 0; background: rgba(5, 7, 12, 0.82);
+    display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 50;
+  }
+  .modal[hidden] { display: none; }
+  .modal-card {
+    background: var(--panel); border: 1px solid var(--green); border-radius: 14px;
+    max-width: 640px; width: 100%; max-height: 86vh; overflow-y: auto;
+    padding: 26px 28px; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  .modal-close {
+    position: absolute; top: 12px; right: 12px; background: var(--panel2);
+    border: 1px solid var(--line); color: var(--dim); border-radius: 8px;
+    width: 30px; height: 30px; cursor: pointer; font-size: 14px;
+  }
+  .modal-close:hover { color: #fff; border-color: var(--green); }
+  .modal-card h3 { font-size: 18px; color: #fff; margin-bottom: 4px; padding-right: 30px; }
+  .modal-card .m-intro { color: var(--dim); font-size: 13.5px; margin-bottom: 14px; }
+  .modal-card ol { padding-left: 22px; }
+  .modal-card ol li { margin: 9px 0; color: #c2cbda; font-size: 13.5px; }
+  .modal-card .ui {
+    background: var(--panel2); border: 1px solid var(--line); border-radius: 6px;
+    padding: 0 7px; font-size: 12px; color: var(--green); white-space: nowrap;
+    font-family: Consolas, monospace;
+  }
+  .modal-card .tips {
+    margin-top: 16px; background: var(--panel2); border: 1px solid var(--line);
+    border-radius: 10px; padding: 12px 14px;
+  }
+  .modal-card .tips b { color: var(--gold); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+  .modal-card .tips ul { padding-left: 18px; margin-top: 6px; }
+  .modal-card .tips li { color: #b9c2d1; font-size: 12.5px; margin: 4px 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>SPACEEXPLORER</h1>
+  <div class="tagline">A galaxy of blocks, credits, and one very angry machine at its center.</div>
+  <p class="pitch">
+    You start on the rim of a hostile galaxy with a small ship and 500 credits.
+    <strong>Build</strong> your ship block by block, <strong>explore</strong> inward through
+    ever-richer (and ever more dangerous) territory, <strong>trade and mine</strong> your way to a
+    fortune, <strong>command a fleet</strong> that works for you even while you sleep — and finally
+    breach the barrier at the core to destroy <strong>the Ravager</strong> and free the galaxy.
+  </p>
+
+  <!-- ======================= CORE LOOP ======================= -->
+  <section>
+    <h2><span class="ico">🔄</span> The Core Loop</h2>
+    <div class="sub">Everything in the game feeds this cycle — each lap takes you one ring closer to the core.</div>
+    <div class="loop">
+      <div class="step"><b>EXPLORE</b><span>jump sector to sector</span></div>
+      <div class="arr">→</div>
+      <div class="step"><b>EARN</b><span>mine · trade · fight</span></div>
+      <div class="arr">→</div>
+      <div class="step"><b>UPGRADE</b><span>ship · fleet · gear</span></div>
+      <div class="arr">→</div>
+      <div class="step"><b>PUSH DEEPER</b><span>tougher rings, better rewards</span></div>
+      <div class="arr">→</div>
+      <div class="step"><b>WIN</b><span>artifacts → barrier → Ravager</span></div>
+    </div>
+    <div class="loopnote">The galaxy is a 100×100 grid of sectors arranged in rings — the closer to the center, the better the materials and the meaner the pirates.</div>
+  </section>
+
+  <!-- ======================= MATERIALS ======================= -->
+  <section>
+    <h2><span class="ico">⛏️</span> Six Materials, Six Rings</h2>
+    <div class="sub">Materials are the game's backbone: they gate where you can survive, what you can build, and how hard your guns hit.</div>
+    <div class="mats">
+      <div class="mat"><b><span class="swatch" style="background:#9aa3ad"></span>Iron</b><span>the rim · your starting point</span></div>
+      <div class="mat"><b><span class="swatch" style="background:#c8d8e8"></span>Titanium</b><span>lighter, tougher</span></div>
+      <div class="mat"><b><span class="swatch" style="background:#7ad8e8"></span>Cryonite</b><span>unlocks shields</span></div>
+      <div class="mat"><b><span class="swatch" style="background:#7ae89a"></span>Trinite</b><span>unlocks onboard assembly</span></div>
+      <div class="mat"><b><span class="swatch" style="background:#e8b45c"></span>Xenor</b><span>the inner rings</span></div>
+      <div class="mat"><b><span class="swatch" style="background:#b06fe8"></span>Voidstone</b><span>behind the barrier · endgame</span></div>
+    </div>
+    <p style="color:#b9c2d1; font-size:13.5px; margin-top:8px;">
+      A clever twist: <b style="color:var(--green)">turrets hit as hard as the material they're mounted on is tough</b>.
+      Upgrading your hull upgrades your firepower with it, so fights stay fast and fair at every tier.
+    </p>
+  </section>
+
+  <!-- ======================= FEATURE CARDS ======================= -->
+  <section>
+    <h2><span class="ico">🧩</span> The Features</h2>
+    <div class="sub">Nine interlocking systems. Every card lists what it feeds into — nothing exists in isolation.</div>
+    <div class="grid">
+
+      <div class="card" data-walk="build">
+        <h3>🛠️ Ship Building</h3>
+        <p>Design your ship on a grid, Lego-style. Every block matters: engines push, thrusters turn (further from the center = better leverage), generators power shields, cargo bays haul, crew quarters staff it all.</p>
+        <ul>
+          <li>Drag-to-size blocks, mirror tool, 50-step undo</li>
+          <li>Turrets mount on hardpoints — bigger mounts fit bigger guns</li>
+          <li>Damage is per-block: lose your engines and you'll limp; lose your core and it's over</li>
+          <li>Up to 6 module slots grow with your hull size</li>
+        </ul>
+        <div class="links"><span class="lbl">Feeds into:</span><span class="chip">Combat</span><span class="chip">Fleet (commissioning)</span><span class="chip">Mining & cargo</span></div>
+      </div>
+
+      <div class="card" data-walk="explore">
+        <h3>🗺️ Exploration & the Galaxy Map</h3>
+        <p>Fog of war covers the galaxy. Jump sector to sector, scan your surroundings, plot multi-jump routes that fly themselves, and shortcut across the galaxy through paired warp gates.</p>
+        <ul>
+          <li>Flying is physical: your ship banks toward its course (big hulls lumber, light ones snap around), steers around asteroids and stations, and never ghosts through anything</li>
+          <li>Every station type looks like what it is — a rotating trade wheel, an open drydock with a half-built hull inside, greenhouse domes, a grimy tank-farm refinery</li>
+          <li>Sensors and scout captains widen what each jump reveals</li>
+          <li>Anomalies hide treasure maps, salvage, modules — or ambushes</li>
+          <li>Rare giant asteroids: sell the claim for fast cash, or found a permanent ore mine</li>
+          <li>Ancient battlefields drift in empty space — one-time debris fields of broken hulls nobody witnessed die, ready to strip for salvage</li>
+          <li>Station rumors point you to the Wardens' lairs</li>
+        </ul>
+        <div class="links"><span class="lbl">Feeds into:</span><span class="chip">Trade routes</span><span class="chip">Fleet orders</span><span class="chip">Endgame (finding lairs)</span></div>
+      </div>
+
+      <div class="card" data-walk="combat">
+        <h3>⚔️ Combat</h3>
+        <p>Battles are real-time, physical fights: shots strike individual blocks, shields form bubbles, missiles arc in and point-defense guns swat them down, carriers launch fighter swarms.</p>
+        <ul>
+          <li>Plan first: stances, target priorities, formations, retreat thresholds</li>
+          <li>Command mid-fight: focus fire, change stance, retreat (retreat always gets you out — at a price)</li>
+          <li>Big rosters fight in waves of 10 per side</li>
+          <li>Crippled enemies surrender — capture the hull or scrap it</li>
+          <li>Wrecks remember what died there: return to a battle site and see the broken, charred hulls of the ships you destroyed — visibly eroding as you strip them for salvage</li>
+          <li>No two threats look alike: over a dozen pirate hull variants, half a dozen civilian freighter designs, and each faction's own dedicated warship classes</li>
+          <li>Every faction's ships read as themselves at a glance — Okkan hammerheads, Veyra lances, Solmar missile outriggers, Drex scrap-welds, Ithil carrier wings — with a subtle faction color accent on any hull, even captured ones</li>
+          <li>Every mounted laser fires its own visible beam — a four-laser miner carves rock with four beams, not one</li>
+          <li>Ambushes roll different compositions per sector — light swarms, artillery packs behind a screen, carrier groups, or a few hardened veterans</li>
+          <li>Rare Pirate Base HQs are ruled by named pirate lords on unique flagship hulls — read their dossier before you engage, beat them for guaranteed Legendary loot</li>
+        </ul>
+        <div class="links"><span class="lbl">Feeds into:</span><span class="chip">Loot & wrecks</span><span class="chip">Reputation</span><span class="chip">Captured blueprints</span></div>
+      </div>
+
+      <div class="card" data-walk="economy">
+        <h3>💰 Economy & Trade</h3>
+        <p>Six station types with living markets: prices move with stock, producers sell cheap, consumers pay well. Haul goods along the gradients, or let the trade ledger remember every price you've ever seen.</p>
+        <ul>
+          <li>Refine mined ore into building materials (80% yield — or free onboard)</li>
+          <li>Craft turrets at equipment docks from recipes</li>
+          <li>Contraband pays 1.6× in faction space — if the patrols don't catch you</li>
+          <li>Build your own trade depots, factories, and asteroid mines; chain factories (machinery → electronics) for real production lines</li>
+        </ul>
+        <div class="links"><span class="lbl">Feeds into:</span><span class="chip">Ship building</span><span class="chip">Fleet costs</span><span class="chip">Reputation</span></div>
+      </div>
+
+      <div class="card" data-walk="fleet">
+        <h3>🚀 Fleet Command</h3>
+        <p>Commission copies of your designs at shipyards, hire captains, and put the galaxy to work. Ships fly their orders for real — mine a field, run a trade loop, patrol a sector, escort you into battle.</p>
+        <ul>
+          <li>7 captain classes that level up: miners, traders, explorers, smugglers, hunters, commodores, industrialists</li>
+          <li>Command from the map or right in the sector — box-select a group, right-click a target, shift-queue chains of orders</li>
+          <li>Watch them work: your miners visibly fly rock to rock, beams and all</li>
+          <li>Set a miner to <b>Auto-mine (roam)</b> and it clears a field, then flies itself to the nearest sector that still has ore — hands-free forever</li>
+          <li>Miners manage their own cargo hold: fit a refinery and it drains ore into materials as it works, pausing mining only until there's room again; without one, a full hold sends it on an automatic supply run to the nearest refinery and back</li>
+          <li>Set a captained ship to <b>Supply station…</b> and it parks at a station, cashing in whatever material it's asked for at a cash premium — a standing courier for that station's request</li>
+          <li>Everything keeps running on other screens — and up to 4 hours while the game is closed</li>
+        </ul>
+        <div class="links"><span class="lbl">Feeds into:</span><span class="chip">Economy (automation)</span><span class="chip">Combat (escorts)</span><span class="chip">Exploration (scouts)</span></div>
+      </div>
+
+      <div class="card" data-walk="factions">
+        <h3>🏛️ Factions & War</h3>
+        <p>Five factions rule the mid-rings, and they don't get along. Wars break out, fronts ignite, and territory changes hands — with or without you. Pick a side at any front and tip the balance yourself.</p>
+        <ul>
+          <li>Reputation from trading and pirate-hunting: better prices, patrol protection, allied warships</li>
+          <li>Sack a faction back to its core, then assault its capital — collapse it for good</li>
+          <li>Each faction sells an exclusive module to its best friends (rep 60+)</li>
+          <li>Go too far the other way and you're an outlaw: docks close, patrols shoot on sight</li>
+        </ul>
+        <div class="links"><span class="lbl">Feeds into:</span><span class="chip">Economy (prices)</span><span class="chip">Combat (allies/sieges)</span><span class="chip">Smuggling</span></div>
+      </div>
+
+      <div class="card" data-walk="loot">
+        <h3>💎 Loot, Rarity & Research</h3>
+        <p>Turrets and modules come in four qualities — Common to Legendary — and quality is real power. Battles drop better gear the deeper you fight; bosses guarantee Rare or better.</p>
+        <ul>
+          <li>Over a dozen generic modules: shields, damage, speed, cargo, scanners, mining rigs, repair fields, jump range, crew and point-defense boosts…</li>
+          <li>Five faction-exclusive modules aren't just bigger numbers — each is a build-around effect: in-combat shield regen, an opening-salvo damage spike, sharper weapon tracking, doubled ramming damage, an extra fighter per bay</li>
+          <li>Research stations grind three spares into one of the next tier</li>
+          <li>Legendary gear only comes from combat — the market can't sell you the best</li>
+        </ul>
+        <div class="links"><span class="lbl">Feeds into:</span><span class="chip">Ship power</span><span class="chip">Combat rewards</span><span class="chip">Sieges (faction exclusives)</span></div>
+      </div>
+
+      <div class="card" data-walk="missions">
+        <h3>🎯 Objectives, Missions & QoL</h3>
+        <p>A fifteen-step objective ladder guides you from your first mined rock to the final battle — early rungs, then a midgame band (found a mine, capture a ship, win a warfront, clear a Pirate Base HQ, reach the deep xenor ring), the Warden hunt, and the Ravager — each step paying a reward. Station bulletin boards offer rotating bounties and deliveries, while every station also keeps a standing material request you (or a fleet ship) can fetch for a premium. Story beats surface the galaxy's history as you hit milestones, and an in-game Codex explains every system.</p>
+        <ul>
+          <li>Missions pay fair money — the faction reputation is the real prize</li>
+          <li>Station requests pay a straight cash premium over market price — no reputation, no deadline, just haul the material in and get paid; a fresh request rolls in the moment one's fulfilled</li>
+          <li>Story fragments — anomalies, Warden memories, the barrier, the throne — build toward an epilogue, re-readable in the Codex</li>
+          <li>The Codex also catalogues every ship and station you've encountered (stats + loadout unlock as you meet them) and a full turret reference table — plus a spoiler-safe gallery of every hull in the galaxy, browsable from the main menu before you've even started</li>
+          <li>Three save slots + export/import; start on a chosen galaxy seed, or unlock New Game+ after your first victory</li>
+          <li>New Game+ hands you a <b>remixed galaxy</b> — denser and tougher pirates, more anomalies to investigate, and extra Pirate Base HQs to storm — so a second run feels freshly dangerous, not a rerun (your original campaigns are untouched)</li>
+          <li>A living world: NPC traders on the lanes, wandering merchants, pirate raids you can choose to repel</li>
+        </ul>
+        <div class="links"><span class="lbl">Feeds into:</span><span class="chip">Onboarding</span><span class="chip">Reputation</span><span class="chip">Everything, gently</span></div>
+      </div>
+
+      <div class="card" data-walk="multiplayer">
+        <h3>🌐 Multiplayer (self-hosted)</h3>
+        <p>Play the same galaxy with friends. A friend runs a small self-hosted server; everyone else joins with an address — no accounts, no matchmaking service, no always-online requirement for singleplayer.</p>
+        <ul>
+          <li>Cooperative shared galaxy: same sectors, wars, and stations for every connected player</li>
+          <li>Your real ship design is uploaded and validated server-side — no client can lie about their own stats</li>
+          <li>See other players' ships fly around live in a shared sector</li>
+          <li>Singleplayer stays 100% local — no server required unless you choose to connect</li>
+        </ul>
+        <div class="links"><span class="lbl">Feeds into:</span><span class="chip">Ship building (blueprint sync)</span><span class="chip">Exploration (shared galaxy)</span><span class="chip">Factions & War (shared fronts)</span></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ======================= CONNECTION MAP ======================= -->
+  <section>
+    <h2><span class="ico">🕸️</span> How It All Connects</h2>
+    <div class="sub">Follow the resources: every activity produces something another system consumes.</div>
+    <div class="flowbox">
+      <div class="flow">
+        <div class="lane">
+          <span class="lanehead">The industry chain</span>
+          <span class="tag threat">Asteroids</span><span class="verb">mine →</span>
+          <span class="tag res">Ore</span><span class="verb">refine (80%) →</span>
+          <span class="tag res">Materials</span><span class="verb">build →</span>
+          <span class="tag act">Better ships & fleet</span><span class="verb">which mine faster →</span>
+          <span class="tag res">More ore ♻</span>
+        </div>
+        <div class="lane">
+          <span class="lanehead">The war chain</span>
+          <span class="tag threat">Pirates & battles</span><span class="verb">victory →</span>
+          <span class="tag res">Credits · loot · wreck fields</span><span class="verb">salvage →</span>
+          <span class="tag res">Materials & rare gear</span><span class="verb">equip →</span>
+          <span class="tag act">Stronger fleet</span><span class="verb">clears deeper rings ♻</span>
+        </div>
+        <div class="lane">
+          <span class="lanehead">The trust chain</span>
+          <span class="tag act">Trading · missions · defending</span><span class="verb">builds →</span>
+          <span class="tag res">Faction reputation</span><span class="verb">unlocks →</span>
+          <span class="tag act">Better prices · patrol cover · allied warships · exclusive modules</span>
+        </div>
+        <div class="lane">
+          <span class="lanehead">The victory chain</span>
+          <span class="tag threat">4 Warden lairs</span><span class="verb">defeat →</span>
+          <span class="tag goal">4 Artifacts</span><span class="verb">open →</span>
+          <span class="tag goal">The Barrier</span><span class="verb">enter →</span>
+          <span class="tag threat">The Fortress (3 waves)</span><span class="verb">destroy →</span>
+          <span class="tag goal">GALAXY LIBERATED ★</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= FACTIONS ======================= -->
+  <section>
+    <h2><span class="ico">🏳️</span> The Five Factions</h2>
+    <div class="sub">Each fights with its own doctrine and its own dedicated warship classes — learn them before you pick a side at a war front.</div>
+    <div class="factions">
+      <div class="fac" style="border-top: 3px solid #5cb8e8;"><b>Veyra Combine</b><span>disciplined laser lances behind point-defense screens</span></div>
+      <div class="fac" style="border-top: 3px solid #e8935c;"><b>Okkan Pact</b><span>cannon brawlers that close in and slug it out</span></div>
+      <div class="fac" style="border-top: 3px solid #9ae87a;"><b>Solmar Republic</b><span>missile archers kiting behind escort screens</span></div>
+      <div class="fac" style="border-top: 3px solid #e87ab8;"><b>Drex Syndicate</b><span>fast raider swarms — quantity is quality</span></div>
+      <div class="fac" style="border-top: 3px solid #b0a5e8;"><b>Ithil Ascendancy</b><span>carriers and fighter wings commanding from range</span></div>
+    </div>
+  </section>
+
+  <!-- ======================= ENDGAME ======================= -->
+  <section>
+    <h2><span class="ico">👑</span> The Road to Victory</h2>
+    <div class="sub">The whole game builds to this — a fully winnable campaign from your first iron rock to the Ravager's throne.</div>
+    <div class="timeline">
+      <div class="tstep"><span class="n">1</span><b>Learn the rim</b><span>Mine, refine, trade, clear your first pirates. The objective ladder walks you through it.</span></div>
+      <div class="tstep"><span class="n">2</span><b>Build an empire</b><span>Commission a fleet, hire captains, set up trade routes and stations that earn while you explore.</span></div>
+      <div class="tstep"><span class="n">3</span><b>Hunt the Wardens</b><span>Four distinct boss battleships — Vigil, Pharos, Tempest, and Maul, each with its own fighting doctrine and memory — guard the barrier artifacts in lairs near the core ring. Buy rumors to find them.</span></div>
+      <div class="tstep"><span class="n">4</span><b>Breach the barrier</b><span>Four artifacts open the sealed core — voidstone territory, the galaxy's richest and deadliest ground.</span></div>
+      <div class="tstep"><span class="n">5</span><b>Storm the fortress</b><span>Three staged waves at (0,0): shield spires, gun platforms and a carrier, then the Ravager itself.</span></div>
+      <div class="tstep"><span class="n">6</span><b>The remnant layer</b><span>Winning isn't the end. Dormant Warden remnants and two apex superbosses — <b>Hunter Alpha</b> and the <b>Warden Remnant</b> — re-emerge across the cleared galaxy. Optional post-victory hunts, the hardest fights in the game, for legendary trophies.</span></div>
+    </div>
+  </section>
+
+  <!-- ======================= CAPTAINS ======================= -->
+  <section>
+    <h2><span class="ico">🧑‍✈️</span> Captains — Your Middle Management</h2>
+    <div class="sub">No captain, no orders. Each class levels 1–5, growing steadily stronger at its specialty.</div>
+    <table>
+      <tr><th>Class</th><th>What they're for</th></tr>
+      <tr><td><b>Miner</b></td><td>Faster mining and salvage; fewer trips wasted on cargo transfers</td></tr>
+      <tr><td><b>Trader</b></td><td>Bigger, smarter cargo runs on your trade routes</td></tr>
+      <tr><td><b>Explorer</b></td><td>Scouts sweep faster and reveal a wider radius</td></tr>
+      <tr><td><b>Smuggler</b></td><td>Escorting you cuts patrol scan odds hard and boosts black-market contraband sell prices</td></tr>
+      <tr><td><b>Hunter</b></td><td>Hits harder in fleet battles</td></tr>
+      <tr><td><b>Commodore</b></td><td>Tougher hull in fleet battles — the all-round warfighter for patrols and escorts</td></tr>
+      <tr><td><b>Industrialist</b></td><td>Parked in a sector, boosts your stations' output there</td></tr>
+    </table>
+  </section>
+
+  <footer>
+    SpaceExplorer · feature overview · everything described here is built, playable, and covered by automated tests.<br>
+    💡 Click any feature card above for a quick how-to-play walkthrough.
+  </footer>
+</main>
+
+<!-- ======================= WALKTHROUGH MODAL ======================= -->
+<div class="modal" id="modal" hidden>
+  <div class="modal-card">
+    <button class="modal-close" id="m-close" title="Close (Esc)">✕</button>
+    <h3 id="m-title"></h3>
+    <p class="m-intro" id="m-intro"></p>
+    <ol id="m-steps"></ol>
+    <div class="tips" id="m-tips"></div>
+  </div>
+</div>
+
+<script>
+const WALKTHROUGHS = {
+  build: {
+    title: '🛠️ Ship Building — quick walkthrough',
+    intro: 'Open it with the Ship Builder button — from the main menu or the top bar of any sector.',
+    steps: [
+      'Pick a block from the left palette (Hull, Engine, Shield…) and a <span class="ui">Material</span> tier below it. Your ship’s nose points UP (▲ FORWARD).',
+      'Click-and-drag on the grid to place the block at any size — a 2×4 engine is simply four times the engine. Green ghost = fits, red = blocked.',
+      'For weapons: place a <span class="ui">Turret Mount</span>, then choose a turret and a quality from the palette. Bigger mounts fit bigger guns (a size-3 missile launcher needs 6 cells).',
+      'Watch the stats panel on the right — mass, speed, power ⚠ and crew ⚠ warnings update live as you build. Thrusters turn better the farther they sit from the center.',
+      'Want an angled prow instead of a boxy one? Pick Hull or Armor, flip the palette\'s <span class="ui">Shape</span> row to Triangle, and drag out a wedge at any size — press <span class="ui">R</span> (or the "Rotate wedge" button) to spin which corner the point faces.',
+      'Use <span class="ui">Mirror ↔</span> for instant symmetry and <span class="ui">Ctrl+Z</span> to undo (50 steps).',
+      'Made a mistake three edits ago? Click any block to select it and press <span class="ui">Del</span> — or grab the <span class="ui">Eraser (E)</span> and drag a box to clear a whole area (your core is safe from the box).',
+      'Fix anything red in the validation list (every ship needs a connected core), then hit <span class="ui">Save Ship</span>.',
+      'Keep multiple designs with <span class="ui">Designs…</span>: your ★ FLAGSHIP is the ship you fly (editing it charges materials — you only pay for what you added, removals refund), while every other design is a free template. Draft new fleet ships without ever touching your flagship.',
+      'Commission a template as a fleet ship at any Shipyard (full price), or promote it to flagship from Designs… (pays the material difference).',
+      'Try the design risk-free with <span class="ui">Test in Battle</span> before taking it into the campaign.'
+    ],
+    tips: [
+      'Generators must cover your power draw or shields run weak — watch the ⚠.',
+      'Crew quarters matter on big ships: understaffed = up to −25% handling and shield regen.',
+      'Drafting a new design does not disturb your flagship — and if auto-mine is running, it keeps mining while you build.',
+      'Build past a 10×20 hull and the sector and battle views automatically zoom out to fit your ship — asteroids, stations, and other ships shrink right along with it, so nothing you build ever outgrows the screen.',
+      'A triangle block is half the mass, HP, and cost of the same-size rectangle — it\'s literally half the material — but it still occupies (and blocks hits across) the full square footprint underneath.'
+    ]
+  },
+  explore: {
+    title: '🗺️ Exploration — quick walkthrough',
+    intro: 'Press Galaxy Map in any sector. Dark = unknown, dim = scanned from afar, bright = visited.',
+    steps: [
+      'Click any sector to inspect it in the right-hand panel — type, danger, faction, station.',
+      'Inside the white ring? Hit <span class="ui">Jump to X, Y</span>. Farther away? Use <span class="ui">Plot route (N jumps)</span> and your ship auto-hops the whole way, scanning as it goes.',
+      'Jumps keep you on the map so you can chain them — you are only pulled into a sector when a patrol intercepts you on arrival. Press <span class="ui">&lt; Sector</span> to fly around in person.',
+      'The <b>Nearest stations</b> panel on the left lists the closest known sector for every station type — click a row to see it. ⬢ marks a Hyper Zone.',
+      'Every jump reveals neighboring sectors. Add sensor blocks or a Radar Array module to widen the sweep — or send a captained ship on a <span class="ui">Scout this region</span> order.',
+      'Find a glowing ring in a sector? That’s a warp gate — <span class="ui">Traverse gate</span> teleports you across the galaxy for free.',
+      'Golden dots are anomalies: <span class="ui">Investigate anomaly</span> for salvage, credits, a module, a treasure map… or a trap.',
+      'Looking for the Wardens? Dock at any station and <span class="ui">Buy Warden lair rumor</span> — it marks the nearest lair ◆ on your map.'
+    ],
+    tips: [
+      'The purple ring at the center is the Barrier — sealed until you hold 4 artifacts.',
+      'Material tiers improve ring by ring: push inward as soon as your ship can take it.',
+      'Some inhabited sectors are <b>Hyper Zones</b>: bustling hubs of 2-4 stations (shipyards and equipment docks are much more common there), each berth with its own market.',
+      'The map also shows wars (⚔), your fleet, owned stations, and recent territory flips.'
+    ]
+  },
+  combat: {
+    title: '⚔️ Combat — quick walkthrough',
+    intro: 'Red sectors mean pirates. The ENGAGE button starts the fight — via the Battle Planner.',
+    steps: [
+      'In a hostile sector, press <span class="ui">ENGAGE</span>. Any of your fleet ships stationed there join automatically.',
+      'In the planner, set each ship’s stance (<span class="ui">aggressive</span> / <span class="ui">kite</span> / <span class="ui">protect</span>), target priority, formation slot, and a retreat threshold — "fall back below 30% hull" saves ships.',
+      'Press <span class="ui">LAUNCH BATTLE</span>. Battles run in real time — speed them up with <span class="ui">2×</span>/<span class="ui">4×</span> or pause with <span class="ui">⏸</span>.',
+      'Click one of your ship cards (left side) to command it: change stance, <span class="ui">Focus target</span> (then click an enemy card), or <span class="ui">Retreat ship</span>.',
+      'Watch the physics: shots chew through individual blocks, shields flare, point-defense sparks down missiles and fighters.',
+      'After the fight, the report shows damage, loot, and wrecks. Enemies flying a white ⚑ surrendered — <span class="ui">Keep hull</span> to add the ship to your fleet (needs spare crew) or <span class="ui">Scrap</span> it for half its materials.'
+    ],
+    tips: [
+      'Retreat always works — after ~30 seconds of running your ship jumps out, whatever is chasing it.',
+      'Bring point defense against threat-4+ pirates: they field carriers and missile boats.',
+      'Losing hurts but doesn’t end you: you respawn at home, minus 20% credits and some repairs.',
+      'Your first pirate fight is always the same easy pair of raiders — the wilder hull variants (twin-cannon brawlers, missile barrage boats, swarm carriers) start showing up once you\'ve proven you can handle threat 2+.'
+    ]
+  },
+  economy: {
+    title: '💰 Economy & Trade — quick walkthrough',
+    intro: 'Stations are the economy. Fly close ("Fly to station"), then press Dock when the button lights up.',
+    steps: [
+      'In the <span class="ui">Market</span> tab, watch the stock column: full shelves = cheap, empty = expensive. <span class="ui">Buy 25</span> where it’s produced, <span class="ui">Sell all</span> where it’s needed.',
+      'Mined ore takes cargo space until refined. Use the <span class="ui">Refine ore</span> tab (80% yield, small fee) — or fit refinery blocks and it happens for free while you fly, and keeps clearing the hold even while you are on the map or fleet screens.',
+      'Hate babysitting rocks? Press <span class="ui">Auto-mine…</span> in any asteroid sector: your flagship works the whole field itself, refining whenever the hold fills — pick <span class="ui">Mine, refine &amp; sell</span> and it turns the entire field into credits at the local station. It keeps working while you are off in the builder, map, or fleet screens.',
+      'At Equipment Docks, <span class="ui">Craft turrets</span> turns materials into spare guns for your builds and fleet.',
+      'On the galaxy map, open the <span class="ui">Trade Ledger</span> — it remembers every price you’ve seen and shows the fattest buy-low/sell-high margins.',
+      'Feeling brave? Buy contraband at stations outside faction space and sell it inside — black-market buyers pay 1.6×, but patrols scan arrivals.',
+      'Claim an empty, safe sector with <span class="ui">Build station…</span>: Trade Depots earn passive credits; Factories produce goods — deliver inputs (e.g. machinery for electronics) to keep the line running.'
+    ],
+    tips: [
+      'Your trading moves prices: flooding a market drops what it pays. Spread your routes.',
+      'Every trade with a faction station earns a little reputation — regulars get better prices.',
+      'Station income keeps accruing while the game is closed (up to 4 hours).'
+    ]
+  },
+  fleet: {
+    title: '🚀 Fleet Command — quick walkthrough',
+    intro: 'Your fleet does the grinding for you. Build it at shipyards, command it from anywhere.',
+    steps: [
+      'Dock at a Shipyard → <span class="ui">Commission ship</span> → pick one of your saved designs. It costs materials plus spare turrets from your inventory.',
+      'Open <span class="ui">Fleet</span> and hire a captain (400 cr pot luck, 600 cr to pick the class). No captain, no orders.',
+      'Command from the galaxy map: click a ship in the bottom roster, then <b>right-click</b> any sector — the menu offers only what makes sense there (Mine, Salvage, Patrol, Scout, Escort, Refine…).',
+      'Hold <span class="ui">⇧ Shift</span> when clicking an order to queue it after the current one — chain "mine here → refine → move home".',
+      'Command in person: in your current sector, click a fleet ship (or drag a box around several), then right-click — same menu, whole group at once. <span class="ui">Esc</span> deselects.',
+      'Watch them work: miners fly rock to rock with beams going, traders dock, escorts hold formation on you.',
+      'Check the <span class="ui">Fleet</span> screen’s alert feed — it reports finished jobs, ambushes fought, and captains leveling up.'
+    ],
+    tips: [
+      'Ships working dangerous sectors get ambushed — real battles, resolved instantly. Reputation with the local faction halves the odds.',
+      'Captains level 1–5 in their specialty (+25% each level). Match the captain to the job.',
+      'Up to 4 hours of fleet work is simulated when you return to the game.',
+      'The status bar only ever shows your flagship\'s own cargo and ore — a miner\'s hold is its own, kept separate so it never looks like your flagship magically filled up.'
+    ]
+  },
+  factions: {
+    title: '🏛️ Factions & War — quick walkthrough',
+    intro: 'Five factions hold the mid-rings. Your reputation with each one (−100 to +100) changes everything.',
+    steps: [
+      'Earn reputation the honest way: trade at their stations (+0.25 per trade), clear pirates in their space (+8), run their missions (+6).',
+      'The perks stack up: ±15% better prices, patrol protection at rep 25 (half as many fleet ambushes), an allied warship joining your pirate fights at rep 40, exclusive modules for sale at rep 60.',
+      'When the map sidebar says <span class="ui">Galaxy at war</span>, look for ⚔ markers — those are active fronts.',
+      'Fly to a front and pick a side: <span class="ui">Fight for [faction]</span>. Their navy fights beside you; win and the sector flips, you pocket a bounty and ±15 reputation.',
+      'A faction beaten back to its core zone can be finished off: visit its capital and press <span class="ui">ASSAULT THE CAPITAL</span> — a brutal two-wave siege. Win, and the faction collapses forever (and drops a legendary exclusive module).',
+      'Watch your standing: below −50 you’re an outlaw there — docks refuse you and patrols attack on sight.'
+    ],
+    tips: [
+      'Wars run on their own clock — territory flips even while you’re busy elsewhere (and offline).',
+      'Come back after time away and you’ll get a war report of the front battles fought in space you’ve scouted — unknown space stays fogged.',
+      'Flipped sectors get battle scars: fresh wreck fields to salvage, halved station stock.',
+      'Piracy and smuggling are faction currency too — negative currency.'
+    ]
+  },
+  loot: {
+    title: '💎 Loot, Rarity & Research — quick walkthrough',
+    intro: 'Gear comes in Common, Uncommon, Rare, and Legendary. Quality is real power: percentage modules scale up to 1.6×, and whole-number ones (scan radius, fighters per bay) gain +1 per tier — a legendary Deep-Space Radar reveals +4 where a common gives +1.',
+    steps: [
+      'Win battles: deeper threats drop better gear, Wardens and the fortress guarantee Rare or better. Anomalies and missions pay items too.',
+      'Turret quality is chosen in the Ship Builder palette when you install a gun — a legendary cannon hits 60% harder.',
+      'Modules go on your flagship: press <span class="ui">Modules</span> in any sector, then <span class="ui">Equip</span>. Slots grow with hull size (up to 6).',
+      'Duplicates aren’t junk: at an Equipment Dock’s <span class="ui">Research</span> tab, combine 3 same-quality spares + 250 cr into 1 random item of the next tier.',
+      'Crafting rolls Common–Rare only — <b>Legendary gear exists only as combat loot</b>. Go earn it.',
+      'Keep an eye out for the golden wandering merchant in station sectors: 3 rolled Uncommon+ items at premium prices, gone in 3 minutes.'
+    ],
+    tips: [
+      'Equipped modules are safe from the research grinder — it only eats spares.',
+      'Faction-exclusive modules (rep 60+ or siege loot) grant unique build-around effects no generic module can — reward the way you already fight, or reshape it.',
+      'Quality colors: grey · green · blue · gold — same order everywhere in the UI.'
+    ]
+  },
+  missions: {
+    title: '🎯 Objectives, Missions & QoL — quick walkthrough',
+    intro: 'The left-hand panel in every sector is your to-do list — the game’s gentle hand on your shoulder.',
+    steps: [
+      'Follow the objective ladder top to bottom: mine 100 ore, refine 50, clear pirates… each step pays out (credits, materials, even modules) the moment you complete it.',
+      'Every station\'s <span class="ui">Missions</span> tab opens on a standing <span class="ui">STATION WANTS</span> card — bring the named material (ore or refined, whatever you\'re carrying) and press <span class="ui">Supply</span> for a straight cash premium over market price. No deadline, no cap — deliver partial amounts as you get them, and a fresh request rolls in the moment one\'s fully paid off.',
+      'Below that sits the rotating board: 2–4 bounty/delivery offers. <span class="ui">Accept</span> up to 4 at once.',
+      'Bounties complete themselves the moment you clear the target sector; deliveries are turned in with the <span class="ui">Deliver</span> button at the right station.',
+      'Mission deadlines are gentle (~30 min) and expiry is penalty-free. The pay is fine, but the +6 reputation is the real reason to bother.',
+      'Three campaign slots live on the main menu — each with its own name, playtime, and progress stars. <span class="ui">Export save</span> downloads a full backup; <span class="ui">Import save</span> restores it anywhere.',
+      'Close the game whenever — fleet orders, station income, and even faction wars catch up (up to 4 hours) when you press <span class="ui">Continue Campaign</span>.'
+    ],
+    tips: [
+      'The objectives panel doubles as a beginner’s guide — if you’re lost, do the top item.',
+      'Each save slot keeps its own ship designs — a new campaign always starts with the default Pioneer, never a previous game’s flagship.',
+      'A <span class="ui">Menu</span> button in the top bar of every screen (sector, fleet, map, builder) takes you straight back to the save-slot picker — progress is saved first, so nothing is lost.',
+      'The 🔊 button (battle screen) mutes everything, including the ambient soundtrack.'
+    ]
+  },
+  multiplayer: {
+    title: '🌐 Multiplayer — quick walkthrough',
+    intro: 'Open Multiplayer from the main menu. One friend hosts, everyone else joins that address.',
+    steps: [
+      'To host: someone runs the server from a terminal (<span class="ui">npm run server -- --port 8080</span>) on a machine reachable by the other players.',
+      'To join: open <span class="ui">Multiplayer</span>, enter a display name and the host\'s <span class="ui">host:port</span>, then press <span class="ui">Join</span>.',
+      'Once connected you land in a shared galaxy sector — build, mine, trade, and fight exactly as in singleplayer, just alongside whoever else is online.',
+      'Your flagship design uploads automatically the first time you connect and again whenever you save it in the Builder — the server checks and stores it, so your real stats (cargo, jump range, scan radius) always match your actual ship.',
+      'Co-located players show up as tinted, name-labelled ships flying live in the sector.'
+    ],
+    tips: [
+      'Singleplayer never needs a server — Multiplayer is a separate, opt-in menu option.',
+      'Wars, territory, and stations are shared: a friend\'s trades and battles move the same galaxy you see.',
+      'Fleet escorts don\'t yet join multiplayer battles — each player currently fights their own flagship solo server-side.'
+    ]
+  }
+};
+
+const modal = document.getElementById('modal');
+const mTitle = document.getElementById('m-title');
+const mIntro = document.getElementById('m-intro');
+const mSteps = document.getElementById('m-steps');
+const mTips = document.getElementById('m-tips');
+
+function openWalk(key) {
+  const w = WALKTHROUGHS[key];
+  if (!w) return;
+  mTitle.textContent = w.title;
+  mIntro.textContent = w.intro;
+  mSteps.innerHTML = w.steps.map((s) => `<li>${s}</li>`).join('');
+  mTips.innerHTML = `<b>Pro tips</b><ul>${w.tips.map((t) => `<li>${t}</li>`).join('')}</ul>`;
+  modal.hidden = false;
+  modal.querySelector('.modal-card').scrollTop = 0;
+}
+function closeWalk() { modal.hidden = true; }
+
+document.querySelectorAll('.card[data-walk]').forEach((card) => {
+  card.addEventListener('click', () => openWalk(card.dataset.walk));
+});
+document.getElementById('m-close').addEventListener('click', closeWalk);
+modal.addEventListener('click', (e) => { if (e.target === modal) closeWalk(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeWalk(); });
+</script>
+</body>
+</html>
